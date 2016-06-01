@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>TextEditor</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	
+  </head>
+  
+  <style>
+  
+		body { 
+			background: url("background.jpg") no-repeat center center fixed; 
+			-webkit-background-size: cover;
+			-moz-background-size: cover;
+			-o-background-size: cover;
+			background-size: cover;
+		}
+
+  
+		#heading_div
+		{
+			
+			height: 100px;
+		}
+ 
+		.text_editor
+		{
+			
+			overflow:auto;
+			word-break: break-all;
+			white-space: normal;
+			background-color: #2B3E50; 
+			height: 400px;
+			margin-top: 30px; 
+			border: 3px solid gray;
+			padding: 14px;
+		
+		}
+		
+		
+		#heading
+		{	
+			margin-left: 31px;
+			color: #A3E8EF;
+			font-weight: bold;
+			font-size: 4.2em;
+			font-family: Avant Garde,Avantgarde,Century Gothic,CenturyGothic,AppleGothic,sans-serif;
+		}
+		
+		#link_div
+		{
+		
+			background-color: #2B3E50; 
+			overflow: auto;
+			height: 200px;
+			border: 1px solid gray;
+			border-radius: 10px;
+			margin-top: 30px;
+			color: white;
+			padding-left: 0px;
+			padding-right: 0px;
+			margin-bottom: 30px;
+		}
+		
+		.text
+		{
+			display: inline-block;
+			font-size: 1em;
+			font-family: Verdana, sans-serif;
+			color: white;
+			
+		}
+		
+		.text:focus
+		{
+			outline: none;
+		}
+		
+		#tooltip {
+			display: inline-block;
+			background-color: black;
+			padding: 7px;
+		}
+		
+		
+		
+		
+	
+  </style>
+  
+  <body contenteditable="false">
+	
+			
+				<div class="container col-md-offset-2 col-md-8 " id="heading_div" style="margin: auto;">
+					<h1 id="heading" > Text Editor  </h1>
+				</div>
+				
+				<div  class="container-fluid col-md-offset-1 col-md-10 text_editor" contenteditable="false" >
+					<div id="content" class="container text col-md-12" contenteditable="true" style="display: inline-block;" spellcheck="true">
+						<p id="first">Start typing here..</p>
+					</div>
+				</div>
+				
+				<div class="container col-md-offset-2" style="clear: left;" contenteditable="false">
+					<button type="button" id="done" class="btn btn-success btn-lg col-md-offset-2"  style="margin-top: 30px; width: 180px;">Done</button>
+					<button type="button" id="replace" class="btn btn-primary btn-lg col-md-offset-1"  style="margin-top: 30px; width: 180px;">Replace</button>
+				</div>
+				
+				<div class="container col-md-offset-3 col-md-6" id ="link_div">
+					<h2 style="margin: 10px;">Links</h2>
+					<div class="list-group" style="margin-top: 20px;  display: inline-block;" id="link_list">
+						
+					</div>
+				</div>
+			
+				<div id="tooltip" contenteditable="false" style="padding: 0px;">
+					
+					<button type="button" class="btn btn-info btn-md"  id="bold" style="float: left;"><span class="glyphicon glyphicon-bold"></span></button>
+					<button type="button" class="btn btn-info btn-md"  id="underline" style="float: left; "><span style="color: white; font-weight: bold; font-size: 1.06em; text-decoration: underline">U</span></button>
+					<button type="button" class="btn btn-info btn-md"  id="italics" style="float: left; "><span class="glyphicon glyphicon-italic"></span></button>
+					<button type="button" class="btn btn-info btn-md"  id="red" style="float: left;"><span style="color: red; font-weight: bold; font-size: 1.06em; margin-bottom: 0px;">R</span></button>
+					
+				</div>
+		
+			
+		
+	<!-- Javascript starts here -->
+	<script>
+	
+		
+		document.designMode ="on";
+		$("#heading_div").attr("contenteditable","false");
+		$("#link_div").attr("contenteditable","false");
+		
+	
+		$("#tooltip").hide();	
+		
+		$("#content").mouseup(function(e) {
+			var text=getSelectedText();
+			if (text.length > 0)
+			{
+				var x = e.pageX;
+				var y = e.pageY;
+				placeTooltip(x,y);
+				$("#tooltip").show();
+			}
+		});
+
+		function getSelectedText() {
+			if (window.getSelection) {
+				return window.getSelection().toString();
+			} else if (document.selection) {
+				return document.selection.createRange().text;
+			}
+		return '';
+		}
+
+		
+		function placeTooltip(x_pos, y_pos) {
+			var d = document.getElementById('tooltip');
+			d.style.position = "absolute";
+			y_pos= y_pos+16;
+			d.style.left = x_pos + 'px';
+			d.style.top = y_pos + 'px';
+		}
+		
+		$(document).mousedown(function(e) {
+        if ($(e.target).is('#tooltip *')) {
+            return;
+        }
+        $("#tooltip").hide();
+    });
+		
+		
+	$("#bold").on("click", function(){
+		document.execCommand('bold');
+	});	
+	
+	$("#italics").on("click", function(){
+		document.execCommand('italic');
+	});
+	
+	$("#underline").on("click", function(){
+		document.execCommand('underline');
+	});
+	
+	$("#red").on("click", function(){
+		document.execCommand('styleWithCSS', false, true);
+		document.execCommand('foreColor', false, "rgba(255,0,0,1)");
+	});
+	
+	$("#done").click(function(){
+		
+		var content = $("#content").text();
+		var bonly = content.match(/<a>(.*?)<\/a>/g);
+		
+			
+		for(i=0; i<bonly.length; i++)
+		{
+			bonly[i] = bonly[i].replace("<a>","");
+			bonly[i] = bonly[i].replace("</a>","");
+			var mydiv = document.getElementById("link_list");
+			var aTag = document.createElement('a');
+			aTag.setAttribute('href',bonly[i]);
+			aTag.setAttribute('target','_blank');
+			aTag.setAttribute('style','display: block;');
+			if(i%2==0)
+				aTag.className = "list-group-item list-group-item-danger";
+			else
+				aTag.className = "list-group-item list-group-item-info";
+			aTag.innerHTML = bonly[i];
+			mydiv.appendChild(aTag);
+			
+		}
+		
+	});
+	
+	var count =0;
+	$("#content").click(function(){
+		if(count==0)
+		{
+			$("#first").text("");
+			var pTag = document.createElement('p');
+			var mydiv = document.getElementById("content");
+			mydiv.appendChild(pTag);
+			count++;
+		}
+	
+	});
+	
+	var random ="";
+	
+	
+	$("#replace").click(function(){
+	
+		RandomWord();
+		
+		
+		
+	});
+	
+	
+	function RandomWord() {
+        var requestStr = "http://randomword.setgetgo.com/get.php";
+
+        $.ajax({
+            type: "GET",
+            url: requestStr,
+            dataType: "jsonp",
+            jsonpCallback: 'RandomWordComplete'
+        });
+    }
+
+    function RandomWordComplete(data) {
+       
+		var patt = /\b((?!nbsp)[a-zA-Z]{4})\b/g;
+		$("#content").html($("#content").html().replace(patt, data.Word));
+    }
+	
+	
+	
+		
+	</script>
+    
+    
+  </body>
+</html>
